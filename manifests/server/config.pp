@@ -34,6 +34,10 @@ class postgresql::server::config {
       notify => Class['postgresql::server::reload'],
     }
 
+    if $postgresql::server::seluser {
+      Concat[$pg_hba_conf_path] { seluser => $postgresql::server::seluser }
+    }
+
     if $pg_hba_conf_defaults {
       Postgresql::Server::Pg_hba_rule {
         database => 'all',
@@ -176,6 +180,10 @@ class postgresql::server::config {
       replace => false,
     }
 
+    if $postgresql::server::seluser {
+      File['/etc/sysconfig/pgsql/postgresql'] { seluser => $postgresql::server::seluser }
+    }
+
     # The init script from the packages of the postgresql.org repository
     # sources an alternate sysconfig file.
     # I. e. /etc/sysconfig/pgsql/postgresql-9.3 for PostgreSQL 9.3
@@ -186,6 +194,9 @@ class postgresql::server::config {
       require => File[ '/etc/sysconfig/pgsql/postgresql' ],
     }
 
+    if $postgresql::server::seluser {
+      File["/etc/sysconfig/pgsql/postgresql-${version}"] { seluser => $postgresql::server::seluser }
+    }
   }
 
 
@@ -196,6 +207,9 @@ class postgresql::server::config {
       mode   => '0640',
       warn   => true,
       notify => Class['postgresql::server::reload'],
+    }
+    if $postgresql::server::seluser {
+      Concat[$pg_ident_conf_path] { seluser => $postgresql::server::seluser }
     }
   }
 
@@ -214,6 +228,10 @@ class postgresql::server::config {
         content => template('postgresql/systemd-override.erb'),
         notify  => [ Exec['restart-systemd'], Class['postgresql::server::service'] ],
         before  => Class['postgresql::server::reload'],
+      }
+
+      if $postgresql::server::seluser {
+        File['systemd-override'] { seluser => $postgresql::server::seluser }
       }
       exec { 'restart-systemd':
         command     => 'systemctl daemon-reload',

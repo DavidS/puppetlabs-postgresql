@@ -103,6 +103,10 @@ class postgresql::params inherits postgresql::globals {
         }
       }
 
+      if $facts.dig('os', 'selinux', 'enabled') {
+        $seluser = 'system_u'
+      }
+
       $psql_path           = pick($psql_path, "${bindir}/psql")
 
       $perl_package_name   = pick($perl_package_name, 'perl-DBD-Pg')

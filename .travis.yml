@@ -123,22 +123,6 @@ jobs:
       script: ["bundle exec rake litmus:acceptance:parallel"]
       services: docker
       stage: acceptance
-    -
-      env: CHECK="check:symlinks check:git_ignore check:dot_underscore check:test_file rubocop syntax lint metadata_lint"
-      stage: static
-    -
-      env: PUPPET_GEM_VERSION="~> 5.0" CHECK=parallel_spec
-      rvm: 2.4.5
-      stage: spec
-    -
-      env: PUPPET_GEM_VERSION="~> 6.0" CHECK=parallel_spec
-      rvm: 2.5.7
-      stage: spec
-branches:
-  only:
-    - master
-    - /^v\d/
-    - release
 notifications:
   email: false
   slack:
